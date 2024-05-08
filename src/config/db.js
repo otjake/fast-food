@@ -1,12 +1,10 @@
 // src/config/db.js
 const mongoose = require('mongoose');
 
-const dbURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/myDatabase';
-const connectDB = () => {
-    return mongoose.connect(dbURI,{
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
+const defaultURL = process.env.MONGODB_URI || 'mongodb://localhost:27017/myDatabase';
+const connectDB = (dbURI) => {
+    let stringUrl = dbURI || defaultURL;
+    return mongoose.connect(stringUrl)
 }
 
 module.exports = connectDB;
