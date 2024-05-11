@@ -6,7 +6,6 @@ const mongoose = require('./config/db');
 const server = require('http').createServer(app)
 //for real time communication
 const io = require('socket.io')(server);
-
 const PORT = process.env.PORT || 3000;
 const start = async () => {
     try {
