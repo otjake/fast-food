@@ -14,7 +14,8 @@ const authenticateUserMiddleware = async (req,res,next) => {
         req.user = {userId, email, username}
         next();
     } catch (error){
-        throw new Error("Not Authorized to access this route")
+        error.message = "unauthenticated"
+        next(error)
     }
 }
 

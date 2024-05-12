@@ -17,7 +17,7 @@ function handleErrors(err, req, res, next) {
     if (process.env.NODE_ENV === "development") {
         if (err.name === "CastError") err = castErrorHandler(err);
         if (err.code === 11000) err = duplicateErrorHandler(err) ;
-        if (err. name === "ValidationError") err = validationErrorHandler (err);
+        if (err.name === "ValidationError") err = validationErrorHandler (err);
         devError(err, res);
     } else if (process.env.NODE_ENV === "production") {
         prodError(err, res);

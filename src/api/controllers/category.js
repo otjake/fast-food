@@ -72,7 +72,7 @@ const deleteCategory = async (req, res, next) => {
 
 const validate = (operation) => {
     switch (operation) {
-        case 'createCategory':
+        case 'categoryUpdateOrCreate':
             return [
                 body('name').isString().isLength({ min: 3, max: 50 }),
             ];
