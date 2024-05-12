@@ -3,13 +3,14 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const {handleErrors} = require("./api/middleware/customErrorHandler");
+const {handleErrors, AppError} = require("./api/middleware/customErrorHandler");
 var rfs = require('rotating-file-stream');
 const bodyParser = require("body-parser");
 
 
 var indexRouter = require('./api/routes/index');
 var usersRouter = require('./api/routes/users');
+var categoriesRouter = require('./api/routes/category');
 
 var app = express();
 
@@ -35,11 +36,16 @@ app.use(bodyParser.json());
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/category', categoriesRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-    next(createError(404));
+// app.use(function(req, res, next) {
+//     next(createError(404));
+// });
+app.all("*", (req, res, next) => {
+    next(new AppError ( `This path ${req.originalUrl} isn't on this server!`, 404));
 });
+
 app.use(handleErrors);
 
 // error handler
