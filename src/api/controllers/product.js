@@ -6,7 +6,13 @@ const Category = require("../models/Category");
 
 const getProducts = async (req, res, next) => {
     try {
-        const products = await Product.find().populate('category').exec();
+        let filterParams = {};
+        if(req.query.category_id){
+            filterParams = {
+                category: req.query.category_id
+            }
+        }
+        const products = await Product.find(filterParams).populate('category').exec();
         //filter by category
         res.status(200).json(products);
     } catch (error) {
@@ -17,15 +23,6 @@ const getProduct = async (req, res, next) => {
     try {
         const product = await Product.findById(req.params.id).populate('category').exec();
         res.status(200).json(product);
-    } catch (error) {
-        next(error)
-    }
-}
-
-const getProductsByCategory = async (req, res, next) => {
-    try {
-        const products = await Product.find({category: req.params.category_id}).populate('category').exec();
-        res.status(200).json(products);
     } catch (error) {
         next(error)
     }
@@ -48,6 +45,13 @@ const updateProduct = async (req, res, next) => {
 
 const createProduct = async (req,res,next) => {
     try {
+        const errors = validationResult(req); // Finds the validation errors in this request and wraps them in an object with handy functions
+
+        if (!errors.isEmpty()) {
+            res.status(422).json({ errors: errors.array() });
+            return;
+        }
+
         let imagePath = req.file.path
         const imageResult = await cloudinary.uploader.upload(imagePath, {
             use_filename: true,
@@ -60,6 +64,9 @@ const createProduct = async (req,res,next) => {
             'price' : req.body.price,
             'category' : req.body.category_id
         }
+
+        console.log("product Body", body)
+        // return res.status(200).json(body)
         const product = await Product.create(body);
         res.status(200).json(product);
     } catch (error) {
@@ -88,8 +95,8 @@ const validate = (operation) => {
             return [
                 body('name').notEmpty().isString().withMessage('Name is required.'),
                 body('price').notEmpty().isNumeric().withMessage('Price must be a numeric value.'),
-                body('category_id').notEmpty().isNumeric().withMessage('Category must be a numeric value.'),
-                body('image').notEmpty().withMessage('Image is required.')
+                body('category_id').notEmpty().withMessage('Category must be a available.'),
+                body('image')
             ];
     }
 }

@@ -1,52 +1,17 @@
 const { logger } = require('morgan'); // Assuming you have a logger module
 
 function handleErrors(err, req, res, next) {
-
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "error";
-    // if (err.name === 'ValidationError') {
-    //     const errorMessages = Object.values(err.errors).map(error => ({
-    //         field: error.path,
-    //         message: error.message
-    //     }));
-    //     return res.status(400).json({ errors: errorMessages });
-    // }
-    // if (err instanceof CustomError) {
-    //     return res.status(err.statusCode || 500).json({ error: err.message });
-    // }
     if (process.env.NODE_ENV === "development") {
         if (err.name === "CastError") err = castErrorHandler(err);
+        //Db duplicate error
         if (err.code === 11000) err = duplicateErrorHandler(err) ;
         if (err.name === "ValidationError") err = validationErrorHandler (err);
         devError(err, res);
     } else if (process.env.NODE_ENV === "production") {
         prodError(err, res);
     }
-    // Log the error
-    // logger.error(err);
-
-    // // Handle ValidationError
-    // if (err.name === 'ValidationError') {
-    //     const errorMessages = Object.values(err.errors).map(error => ({
-    //         field: error.path,
-    //         message: error.message
-    //     }));
-    //     return res.status(400).json({ errors: errorMessages });
-    // }
-    //
-    // // Handle MongoDB errors
-    // console.log("errror",err.name, err.message, err)
-    // if (err.name === 'MongoError') {
-    //     return res.status(500).json({ error: 'Database Error', details: err.message });
-    // }
-    //
-    // // Handle other types of errors
-    // if (err instanceof CustomError) {
-    //     return res.status(err.statusCode || 500).json({ error: err.message });
-    // }
-    //
-    // // Handle other generic errors
-    // return res.status(500).json({ error: 'Internal Server Error' });
 }
 
 // Custom Error class for custom errors
@@ -98,6 +63,11 @@ const validationErrorHandler = (err) => {
     const message = `Invalid input data. ${errors.join(". ")}`;
     return new AppError (message, 400);
 };
+const createErrorInstance = (msg) => {
+    const error = new Error();
+    error.message = msg;
+    return error;
+};
 class AppError extends Error {
     constructor(message, statusCode) {
         super(message);
@@ -108,4 +78,4 @@ class AppError extends Error {
     }
 }
 
-module.exports = { AppError, handleErrors, CustomError };
+module.exports = { AppError, handleErrors, CustomError, createErrorInstance };

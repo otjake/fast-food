@@ -12,6 +12,7 @@ var indexRouter = require('./api/routes/index');
 var usersRouter = require('./api/routes/users');
 var categoriesRouter = require('./api/routes/category');
 var productsRouter = require('./api/routes/product');
+var cartsRouter = require('./api/routes/cart');
 const authenticateUserMiddleware = require("./api/middleware/auth");
 
 var app = express();
@@ -40,6 +41,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/category', authenticateUserMiddleware, categoriesRouter);
 app.use('/product', authenticateUserMiddleware, productsRouter);
+app.use('/cart', authenticateUserMiddleware, cartsRouter);
 
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
